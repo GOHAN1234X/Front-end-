@@ -80,6 +80,10 @@
       font-family: Arial, sans-serif;
       font-weight: normal;
     }
+    /* Change the "Choose ZIP file" label to light red */
+    label[for="fileInput"] {
+      color: #ff6666;
+    }
   </style>
 </head>
 <body>
@@ -154,11 +158,11 @@
       <a class="nav-link" href="javascript:void(0)" onclick="scrollToBots()">Bots</a>
       <a class="nav-link" href="#/service">Service</a>
       <a class="nav-link" href="#/home">Home</a>
-      <a class="nav-link" href="/profile">Profile</a>
+      <a class="nav-link" href="profile.html">Profile</a>
     </div>
   </nav>
 
-  <!-- Profile Modal (Optional, if you want to keep it) -->
+  <!-- Profile Modal (Optional) -->
   <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-white">
@@ -202,7 +206,7 @@
         console.error("Logout error:", e);
       }
       localStorage.removeItem("user");
-      window.location.href = "/signup";
+      window.location.href = "login.html";
     }
 
     function scrollToBots() {
@@ -224,7 +228,7 @@
         }
         document.getElementById("navProfilePic").src = localStorage.getItem("profilePic");
       } else {
-        window.location.href = "/dashboard";
+        window.location.href = "login.html";
       }
     }
 
