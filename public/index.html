@@ -285,7 +285,7 @@
         const user = await res.json();
         localStorage.setItem("user", JSON.stringify(user));
         document.getElementById("loginStatus").innerText = "Login successful!";
-        window.location.href = "admin.html";
+        window.location.href = "/dashboard";
       } catch (error) {
         document.getElementById("loginStatus").innerText = error.message;
       }
