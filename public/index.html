@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lxend Bot - Login</title>
+  <!-- Google Font for a futuristic look -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Basic page styling */
+    body {
+      background: #0d0d0d;
+      color: #cfcfcf;
+      font-family: 'Orbitron', sans-serif;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Loading screen overlay */
+    #loadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #0d0d0d;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+    /* Hide the overlay by fading out */
+    #loadingScreen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* Logo styling and animation */
+    #loadingScreen img {
+      width: 120px;
+      height: auto;
+      animation: popIn 1s ease-out forwards;
+    }
+    /* Text styling and animation - text made smaller */
+    #loadingScreen h1 {
+      margin-top: 10px;
+      font-size: 1.2rem; /* Reduced size */
+      color: #39ff14;
+      letter-spacing: 2px;
+      animation: slideUp 1s ease-out forwards;
+    }
+    /* Load bar container */
+    #loadingBarContainer {
+      width: 80%;
+      max-width: 300px;
+      height: 8px;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 20px;
+      opacity: 0;
+      animation: loadBarAppear 0.5s ease-out forwards;
+      animation-delay: 1s;
+    }
+    @keyframes loadBarAppear {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    /* Load bar fill */
+    #loadingBar {
+      width: 0%;
+      height: 100%;
+      background: #39ff14;
+      transition: width 0.1s linear;
+    }
+    /* Cinematic animations */
+    @keyframes popIn {
+      0% {
+        transform: scale(0.5) rotate(-15deg);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+    @keyframes slideUp {
+      0% {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    /* Stars container behind the card */
+    .stars-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      background: #fff;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkle 2s infinite ease-in-out;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    /* Optional floating planet for extra space vibe */
+    .planet {
+      position: absolute;
+      background: radial-gradient(circle at 30% 30%, #39ff14, #1e1e1e);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: drift 20s linear infinite;
+    }
+    @keyframes drift {
+      from { transform: translate(0, 0); }
+      to { transform: translate(200px, 100px); }
+    }
+    .card {
+      position: relative;
+      z-index: 1;
+      background: #1e1e1e;
+      border: none;
+      box-shadow: 0 4px 8px rgba(57, 255, 20, 0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+    .card-header {
+      background: #262626;
+      border-bottom: 2px solid #39ff14;
+      color: #39ff14;
+      font-size: 1.25rem;
+      text-align: center;
+    }
+    .form-label {
+      color: #006400; /* Dark green */
+    }
+    .btn-success {
+      background: #39ff14;
+      border: none;
+      width: 100%;
+    }
+    .btn-success:hover {
+      background: #32e20f;
+    }
+    .nav-tabs .nav-link {
+      color: #cfcfcf;
+    }
+    .nav-tabs .nav-link.active {
+      color: #39ff14;
+      border-color: #39ff14;
+    }
+    /* Status messages in dark green */
+    .status-message {
+      color: #006400;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen Overlay -->
+  <div id="loadingScreen">
+    <img src="https://i.ibb.co/0yqqKfXd/1000126088-modified.png" alt="Lxend Bot Logo">
+    <h1>Lxend Bot</h1>
+    <div id="loadingBarContainer">
+      <div id="loadingBar"></div>
+    </div>
+  </div>
+  
+  <!-- Stars container -->
+  <div class="stars-container" id="starsContainer"></div>
+  <!-- Optional planet element -->
+  <div class="planet" style="top: 20%; left: 10%;"></div>
+  
+  <div class="card shadow-sm">
+    <div class="card-header">
+      Welcome to Lxend Bot
+    </div>
+    <div class="card-body">
+      <!-- Nav tabs for Login and Register -->
+      <ul class="nav nav-tabs mb-3" id="authTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Login</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Register</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="authTabContent">
+        <div class="tab-pane fade show active" id="login" role="tabpanel">
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginIdentifier" class="form-label">Username or Email</label>
+              <input type="text" class="form-control" id="loginIdentifier" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <button type="submit" class="btn btn-success">Login</button>
+          </form>
+          <p id="loginStatus" class="mt-2 text-center status-message"></p>
+        </div>
+        <div class="tab-pane fade" id="register" role="tabpanel">
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="registerUsername" class="form-label">Username</label>
+              <input type="text" class="form-control" id="registerUsername" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <button type="submit" class="btn btn-success">Register</button>
+          </form>
+          <p id="registerStatus" class="mt-2 text-center status-message"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom Script for authentication and loading screen -->
+  <script>
+    const backendURL = "https://lxend-bot.onrender.com"; // Adjust as needed
+
+    // Simulate load bar progress over 4 seconds
+    let progress = 0;
+    const loadingBar = document.getElementById('loadingBar');
+    const progressInterval = setInterval(() => {
+      progress += 1; // Increase by 1% every 40ms
+      loadingBar.style.width = progress + '%';
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+      }
+    }, 40);
+
+    // Hide the loading screen after 4 seconds
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loadingScreen').classList.add('hidden');
+      }, 4000);
+    });
+
+    // Login form submission
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const identifier = document.getElementById("loginIdentifier").value;
+      const password = document.getElementById("loginPassword").value;
+      document.getElementById("loginStatus").innerText = "Logging in...";
+      try {
+        const res = await fetch(`${backendURL}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier, password })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const user = await res.json();
+        localStorage.setItem("user", JSON.stringify(user));
+        document.getElementById("loginStatus").innerText = "Login successful!";
+        window.location.href = "admin.html";
+      } catch (error) {
+        document.getElementById("loginStatus").innerText = error.message;
+      }
+    });
+
+    // Register form submission
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("registerUsername").value;
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+      document.getElementById("registerStatus").innerText = "Registering...";
+      try {
+        const res = await fetch(`${backendURL}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        document.getElementById("registerStatus").innerText = "Registration successful! You can now log in.";
+      } catch (error) {
+        document.getElementById("registerStatus").innerText = error.message;
+      }
+    });
+
+    // Stars creation for the background
+    const starsContainer = document.getElementById("starsContainer");
+    const starCount = 100;
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement("div");
+      star.classList.add("star");
+      star.style.top = Math.random() * 100 + "%";
+      star.style.left = Math.random() * 100 + "%";
+      star.style.animationDuration = 1 + Math.random() * 3 + "s";
+      starsContainer.appendChild(star);
+    }
+  </script>
+</body>
+</html>

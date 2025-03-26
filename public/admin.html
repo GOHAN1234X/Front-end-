@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lxend Bot Admin Panel</title>
+  <!-- Google Font for a futuristic look -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #cfcfcf;
+      font-family: 'Orbitron', sans-serif;
+      padding-bottom: 70px;
+    }
+    .navbar {
+      background: #1a1a1a;
+      border-bottom: 2px solid #39ff14;
+    }
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #39ff14 !important;
+    }
+    .card {
+      background: #1e1e1e;
+      border: none;
+      box-shadow: 0 4px 8px rgba(57, 255, 20, 0.3);
+      margin-bottom: 20px;
+    }
+    .card-header {
+      background: #262626;
+      border-bottom: 2px solid #39ff14;
+      color: #39ff14;
+      font-size: 1.25rem;
+    }
+    .btn-primary {
+      background: #39ff14;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: #32e20f;
+    }
+    .btn-secondary {
+      background: #333333;
+      border: none;
+    }
+    .bottom-nav {
+      background: #1a1a1a;
+      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 2;
+    }
+    .bottom-nav a {
+      color: #39ff14;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #39ff14;
+    }
+    .offcanvas {
+      background: #1a1a1a;
+    }
+    .offcanvas-title {
+      color: #39ff14;
+    }
+    .offcanvas-body {
+      color: #cfcfcf;
+    }
+    .bot-info small {
+      font-family: Arial, sans-serif;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">Lxend Bot</a>
+      <button class="btn btn-outline-light ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </nav>
+  
+  <!-- Offcanvas Menu -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="d-flex align-items-center mb-3">
+        <img id="navProfilePic" src="" alt="Profile" class="profile-pic me-2">
+        <strong id="navUsername">User</strong>
+      </div>
+      <hr>
+      <button class="btn btn-danger w-100" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Main Admin Panel Container -->
+  <div class="container my-5" id="mainContainer" style="display: none;">
+    <div class="row">
+      <!-- Upload Section -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            Upload Your Python Bot
+          </div>
+          <div class="card-body">
+            <form id="uploadForm">
+              <input type="hidden" id="usernameInput" name="username">
+              <div class="mb-3">
+                <label for="fileInput" class="form-label">Choose ZIP file</label>
+                <input type="file" class="form-control" id="fileInput" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Upload</button>
+              <button type="button" class="btn btn-secondary ms-2" onclick="loadBotsWithStatus()">Refresh</button>
+            </form>
+            <div class="mt-3">
+              <p id="status" class="text-success"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Running Bots Section -->
+      <div class="col-md-6 mb-4" id="botsSection">
+        <div class="card">
+          <div class="card-header">
+            Running Bots
+          </div>
+          <div class="card-body">
+            <ul id="botList" class="list-group"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Bottom Navigation Bar -->
+  <nav class="navbar fixed-bottom bottom-nav">
+    <div class="container d-flex justify-content-around">
+      <a class="nav-link" href="javascript:void(0)" onclick="scrollToBots()">Bots</a>
+      <a class="nav-link" href="#/service">Service</a>
+      <a class="nav-link" href="#/home">Home</a>
+      <a class="nav-link" href="profile.html">Profile</a>
+    </div>
+  </nav>
+
+  <!-- Profile Modal (Optional, if you want to keep it) -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">Your Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="profilePic" src="" alt="Profile Picture" class="rounded-circle mb-3" style="width:150px;height:150px;">
+          <h3 id="profileUsername"></h3>
+          <p id="profileEmail"></p>
+          <p id="profileJoined"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom Script for admin panel -->
+  <script>
+    const backendURL = "https://lxend-bot.onrender.com"; // Adjust as needed
+
+    // Array of profile picture URLs
+    const profilePics = [
+      "https://i.ibb.co/5gP9ZR8T/Luffy-live-wallpaper-3.jpg",
+      "https://i.ibb.co/3ywQRYv5/ai-image-1740645638350.webp"
+    ];
+
+    function getRandomProfilePic() {
+      return profilePics[Math.floor(Math.random() * profilePics.length)];
+    }
+
+    async function logout() {
+      try {
+        await fetch(`${backendURL}/logout`, { method: "POST" });
+      } catch (e) {
+        console.error("Logout error:", e);
+      }
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
+    }
+
+    function scrollToBots() {
+      const botsSection = document.getElementById("botsSection");
+      if (botsSection) {
+        botsSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    function checkAuth() {
+      const user = localStorage.getItem("user");
+      if (user) {
+        document.getElementById("mainContainer").style.display = "block";
+        const profile = JSON.parse(user);
+        document.getElementById("navUsername").innerText = profile.username;
+        document.getElementById("usernameInput").value = profile.username;
+        if (!localStorage.getItem("profilePic")) {
+          localStorage.setItem("profilePic", getRandomProfilePic());
+        }
+        document.getElementById("navProfilePic").src = localStorage.getItem("profilePic");
+      } else {
+        window.location.href = "login.html";
+      }
+    }
+
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("fileInput");
+      if (!fileInput.files.length) return alert("Select a file first!");
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      formData.append("username", document.getElementById("usernameInput").value);
+      document.getElementById("status").innerText = "Uploading...";
+      try {
+        const response = await fetch(`${backendURL}/upload`, {
+          method: "POST",
+          body: formData
+        });
+        const result = await response.text();
+        document.getElementById("status").innerText = result;
+        loadBotsWithStatus();
+      } catch (error) {
+        document.getElementById("status").innerText = "Upload failed. Please try again.";
+      }
+    });
+
+    async function loadBotsWithStatus() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      try {
+        const response = await fetch(`${backendURL}/botsWithStatus?username=${encodeURIComponent(user.username)}`);
+        const bots = await response.json();
+        const botList = document.getElementById("botList");
+        botList.innerHTML = "";
+        const botNames = Object.keys(bots);
+        if (botNames.length === 0) {
+          botList.innerHTML = `<li class="list-group-item">No bots found. Your bot list is empty.</li>`;
+        } else {
+          botNames.forEach(bot => {
+            const botInfo = bots[bot];
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.innerHTML = `
+              <div>
+                <strong>${bot}</strong><br>
+                <small>Script: ${botInfo.script} | PID: ${botInfo.pid}</small><br>
+                <small>Runtime: ${botInfo.runtime} | Status: ${botInfo.status}</small>
+              </div>
+              <button class="btn btn-sm btn-danger" onclick="stopBot('${bot}')">Stop</button>
+            `;
+            botList.appendChild(li);
+          });
+        }
+      } catch (error) {
+        console.error("Error loading bots:", error);
+      }
+    }
+
+    async function stopBot(botName) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      try {
+        await fetch(`${backendURL}/stop/${botName}?username=${encodeURIComponent(user.username)}`, { method: "POST" });
+        loadBotsWithStatus();
+      } catch (error) {
+        console.error("Error stopping bot:", error);
+      }
+    }
+
+    checkAuth();
+    loadBotsWithStatus();
+  </script>
+</body>
+</html>
